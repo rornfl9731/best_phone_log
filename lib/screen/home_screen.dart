@@ -1,3 +1,5 @@
+import 'dart:collection';
+
 import 'package:call_log/call_log.dart';
 import 'package:flutter/material.dart';
 
@@ -19,7 +21,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
     // TODO: implement initState
     super.initState();
     WidgetsBinding.instance.addObserver(this);
-    logs = cl.getJW();
+    logs = cl.getCallLogs();
   }
 
   @override
@@ -62,14 +64,12 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                       child: Column(
                         children: [
                           Expanded(
-                            flex: 1,
-                            child: Row(
+                            flex: 2,
+                            child: Column(
                               children: [
                                 Text(
                                     " 총 통화 : ${snapshot.data!.length.toString()}"),
-                                Text(
-                                  "총 통화 시간 : ${snapshot.data.reduce((value, element) => null)}"
-                                )
+                                Ranking(entries!),
                               ],
                             ),
                           ),
@@ -81,7 +81,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                                   child: Card(
                                     child: ListTile(
                                       leading: cl.getAvator(
-                                          entries!.elementAt(index).callType!),
+                                          entries.elementAt(index).callType!),
                                       title:
                                           cl.getTitle(entries.elementAt(index)),
                                       subtitle: Text(cl.formatDate(new DateTime
@@ -105,7 +105,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                                   onLongPress: () => {print('call')},
                                 );
                               },
-                              itemCount: entries!.length,
+                              itemCount: entries.length,
                             ),
                           ),
                         ],
@@ -120,4 +120,60 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
       ),
     );
   }
+
+  Ranking(Iterable<CallLogEntry> entry){
+    Map my_map = {};
+    var rs = entry.fold(0, (previousValue, element) {
+      if(my_map.containsKey(element.number)){
+        my_map[element.number] += element.duration;
+      }
+      else{
+        my_map[element.number] = element.duration;
+      }
+      return element.duration! + (previousValue as num);
+    });
+
+    final sortedValuesDesc = SplayTreeMap<String, dynamic>.from(
+        my_map, (keys1, keys2) => my_map[keys2]!.compareTo(my_map[keys1]!));
+    print(sortedValuesDesc);
+
+    var first = sortedValuesDesc.keys.toList()[0];
+    var first_ = sortedValuesDesc.values.toList()[0];
+    var second = sortedValuesDesc.keys.toList()[1];
+    
+
+
+    var hour;
+    var min;
+    var sec;
+
+    if(rs >= 3600){
+      hour = (rs / 3600).toInt();
+      rs = rs - hour*3600;
+      min = (rs/60).toInt();
+      rs = rs - min*60;
+      sec = rs;
+
+      return Column(
+        children: [
+          Text(" 총 시간 : ${hour.toString()}시간 ${min.toString()}분 ${sec}초"),
+          Text(" 총 시간 : ${first} -> ${first_}"),
+
+        ],
+      );
+    }
+    else if(rs<3600 && rs>=60){
+      min = (rs/60).toInt();
+      rs = rs - min*60;
+      sec = rs;
+      return Text(" 총 시간 : ${min.toString()}분 ${sec}초");
+    }else{
+      return Text(" 총 시간 : ${sec}초");
+    }
+
+
+
+
+  }
+
 }
