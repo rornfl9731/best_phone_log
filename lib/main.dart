@@ -1,4 +1,5 @@
 import 'package:best_phone_log/screen/home_screen.dart';
+import 'package:best_phone_log/screen/last_page.dart';
 import 'package:best_phone_log/screen/phone_log_screen.dart';
 import 'package:call_log/call_log.dart';
 import 'package:flutter/material.dart';
@@ -18,7 +19,7 @@ class MyApp extends StatefulWidget {
 
 class _MyAppState extends State<MyApp> {
   int _currentIndex = 0;
-  final List<Widget> _children = [PhonelogsScreen(),HomeScreen(),PhonelogsScreen()];
+  final List<Widget> _children = [PhonelogsScreen(),HomeScreen(),HomeScreen()];
   void _onTap(int index){
     setState((){
       _currentIndex = index;
@@ -30,6 +31,7 @@ class _MyAppState extends State<MyApp> {
 
 
     return MaterialApp(
+      debugShowCheckedModeBanner: false,
       home: Scaffold(
         body: _children[_currentIndex],
         bottomNavigationBar: BottomNavigationBar(
@@ -40,18 +42,18 @@ class _MyAppState extends State<MyApp> {
           currentIndex: _currentIndex,
           items: [
             new BottomNavigationBarItem(
-                icon: Icon(Icons.home),
+                icon: Icon(Icons.call ),
                 label: "as"
 
             ),
             new BottomNavigationBarItem(
-                icon: Icon(Icons.mail),
+                icon: Icon(Icons.today),
 
                 label: "as2"
 
             ),
             new BottomNavigationBarItem(
-                icon: Icon(Icons.person),
+                icon: Icon(Icons.dashboard_rounded),
                 label: "as3"
 
             )

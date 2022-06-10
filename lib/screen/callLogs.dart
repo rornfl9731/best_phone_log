@@ -54,17 +54,25 @@ class CallLogs {
     );
   }
 
+  Future<Iterable<CallLogEntry>> getToday() {
+    return CallLog.query(
+        // dateFrom: DateTime.now().subtract(Duration(hours: 10)).millisecondsSinceEpoch,
+      dateFrom: DateTime(DateTime.now().year,DateTime.now().month,07,00).millisecondsSinceEpoch,
+        dateTo: DateTime(DateTime.now().year,DateTime.now().month,DateTime.now().day,24).millisecondsSinceEpoch
+    );
+  }
+
   String formatDate(DateTime dt) {
 
-    return DateFormat('y-MM-d H:m').format(dt);
+    return DateFormat('y년 MM월 dd일 HH시mm분').format(dt);
   }
 
   getTitle(CallLogEntry entry) {
-    if (entry.name == null) return Text(entry.number!);
+    if (entry.name == null) return Text(entry.number!,style: TextStyle(color: Colors.white));
     if (entry.name!.isEmpty)
-      return Text(entry.number!);
+      return Text(entry.number!,style: TextStyle(color: Colors.white));
     else
-      return Text(entry.name!);
+      return Text(entry.name!,style: TextStyle(color: Colors.white));
   }
 
   String getTime(int duration) {
@@ -79,7 +87,7 @@ class CallLogs {
     if (d1.inSeconds - (d1.inMinutes * 60) > 0) {
       formatedDuration += (d1.inSeconds - (d1.inMinutes * 60)).toString() + "초";
     }
-    if (formatedDuration.isEmpty) return "0s";
+    if (formatedDuration.isEmpty) return "0초";
     return formatedDuration;
   }
 }
