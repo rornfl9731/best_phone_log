@@ -74,7 +74,7 @@ class _PhonelogsScreenState extends State<PhonelogsScreen>
                         if(index==0){
                           return Column(
                             children: [
-                              Text(aa.toString()),
+                              Text(aa.toString(),style: TextStyle(color: Colors.white,fontSize: 25), ),
                               GestureDetector(
                                 child: Card(
                                   color: Colors.grey.shade800 ,
@@ -147,7 +147,7 @@ class _PhonelogsScreenState extends State<PhonelogsScreen>
                         else{
                           return Column(
                             children: [
-                              Text(aa.toString()),
+                              Text(aa.toString(),style: TextStyle(color: Colors.white,fontSize: 25), ),
                               GestureDetector(
                                 child: Card(
                                   color: Colors.grey.shade800 ,

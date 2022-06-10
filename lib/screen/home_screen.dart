@@ -175,166 +175,111 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
               Expanded(
                 child: Column(
                   children: <Widget>[
-                    Container(
-                      height: 100,
-                      decoration: BoxDecoration(
-                        color: Colors.deepOrangeAccent,
-                        borderRadius: BorderRadius.circular(10.0),
-                      ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: <Widget>[
-                          ListTile(
-                            title: Text(
-                              '오늘의 통화시간',
-                              style: GoogleFonts.gaegu(
-                                  textStyle: TextStyle(
-                                      color: Colors.white, fontSize: 24)),
-                            ),
-
-                            // title : isHour ? Text("${hour.toString()}시간 ${min.toString()}분 ${sec}초",style:TextStyle(fontSize: 24,color: Colors.white,)) :
-                            // isMin ? Text("${min.toString()}분 ${sec}초",style:TextStyle(fontSize: 24,color: Colors.white,)) : Text("${sec}초",style:TextStyle(fontSize: 24,color: Colors.white,)),
-                            trailing: Icon(
-                              FontAwesomeIcons.phone,
-                              color: Colors.white,
-                            ),
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.only(left: 16.0),
-                            // child: Text(
-                            //   '오늘의 통화시간',
-                            //   style: GoogleFonts.gaegu(
-                            //       textStyle: TextStyle(
-                            //           color: Colors.white, fontSize: 20)),
-                            // ),
-                            child : isHour ? Text("${hour.toString()}시간 ${min.toString()}분 ${sec}초",style:TextStyle(fontSize: 24,color: Colors.white,)) :
-                            isMin ? Text("${min.toString()}분 ${sec}초",style:TextStyle(fontSize: 24,color: Colors.white,)) : Text("${sec}초",style:TextStyle(fontSize: 24,color: Colors.white,)),
-
-                          )
-                        ],
-                      ),
-                    ),
-                    const SizedBox(height: 10.0),
-                    Container(
-                      height: 100,
-                      decoration: BoxDecoration(
-                        color: Colors.green,
-                        borderRadius: BorderRadius.circular(10.0),
-                      ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: <Widget>[
-                          ListTile(
-                            title:Text(
-                              '오늘의 통화건수',
-                              style: GoogleFonts.gaegu(
-                                  textStyle: TextStyle(
-                                      color: Colors.white, fontSize: 24)),
-                            ),
-
-                            trailing: Icon(
-                              Icons.how_to_vote,
-                              color: Colors.white,
-                            ),
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.only(left: 16.0),
-                            child: Text("${entry.length.toString()} 건",
+                    Nemo(
+                        entry,
+                        "오늘의 통화시간",
+                        isHour
+                            ? Text(
+                                "${hour.toString()}시간 ${min.toString()}분 ${sec}초",
                                 style: TextStyle(
                                   fontSize: 24,
                                   color: Colors.white,
-                                )),
-                          )
-                        ],
-                      ),
-                    ),
+                                ))
+                            : isMin
+                                ? Text("${min.toString()}분 ${sec}초",
+                                    style: TextStyle(
+                                      fontSize: 24,
+                                      color: Colors.white,
+                                    ))
+                                : Text("${sec}초",
+                                    style: TextStyle(
+                                      fontSize: 24,
+                                      color: Colors.white,
+                                    )),
+                        Colors.deepOrangeAccent),
                     const SizedBox(height: 10.0),
-                    Container(
-                      height: 100,
-                      decoration: BoxDecoration(
-                        color: Colors.blue,
-                        borderRadius: BorderRadius.circular(10.0),
-                      ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: <Widget>[
-                          ListTile(
-                            title : Text(
-                              '누구랑 가장 오래 통화했어?',
-                              style: GoogleFonts.gaegu(
-                                  textStyle: TextStyle(
-                                      color: Colors.white, fontSize: 24)),
-                            ),
-
-                            trailing: Icon(
-                              FontAwesomeIcons.heart,
+                    Nemo(
+                        entry,
+                        "오늘의 통화건수",
+                        Text("${entry.length.toString()} 건",
+                            style: TextStyle(
+                              fontSize: 24,
                               color: Colors.white,
-                            ),
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.only(left: 16.0),
-                            child: toIsHour
-                                ? Text(
+                            )),
+                        Colors.green),
+                    const SizedBox(height: 10.0),
+                    Nemo(
+                        entry,
+                        "누구랑 가장 오래 통화했어?",
+                        toIsHour
+                            ? Text(
                                 "${toHour.toString()}시간 ${toMin.toString()}분 ${toSec}초 with ${todayBest}",
                                 style: TextStyle(
                                   fontSize: 24,
                                   color: Colors.white,
                                 ))
-                                : toIsMin
+                            : toIsMin
                                 ? Text(
-                                "${toMin.toString()}분 ${toSec}초 with ${todayBest}",
-                                style: TextStyle(
-                                  fontSize: 24,
-                                  color: Colors.white,
-                                ))
+                                    "${toMin.toString()}분 ${toSec}초 with ${todayBest}",
+                                    style: TextStyle(
+                                      fontSize: 24,
+                                      color: Colors.white,
+                                    ))
                                 : Text("${toSec}초 with ${todayBest}",
-                                style: TextStyle(
-                                  fontSize: 24,
-                                  color: Colors.white,
-                                )),
-                          )
-                        ],
-                      ),
-                    ),
+                                    style: TextStyle(
+                                      fontSize: 24,
+                                      color: Colors.white,
+                                    )),
+                        Colors.blue),
                     const SizedBox(height: 10.0),
-                    Container(
-                      height: 100,
-                      decoration: BoxDecoration(
-                        color: Colors.orange,
-                        borderRadius: BorderRadius.circular(10.0),
-                      ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: <Widget>[
-                          ListTile(
-                            title : Text(
-                              '누구랑 가장 여러번 통화했어?',
-                              style: GoogleFonts.gaegu(
-                                  textStyle: TextStyle(
-                                      color: Colors.white, fontSize: 24)),
-                            ),
-
-                            trailing: Icon(
-                              FontAwesomeIcons.businessTime,
+                    Nemo(
+                        entry,
+                        '누구랑 가장 여러번 통화했어?',
+                        Text(
+                            "${sortedValuesDesc2.values.toList()[0][3]}통 with ${sortedValuesDesc2.values.toList()[0][1]}",
+                            style: TextStyle(
+                              fontSize: 24,
                               color: Colors.white,
-                            ),
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.fromLTRB(16,0,0,0),
-                            child: Text(
-                                "${sortedValuesDesc2.values.toList()[0][3]}통 with ${sortedValuesDesc2.values.toList()[0][1]}",
-                                style: TextStyle(
-                                  fontSize: 24,
-                                  color: Colors.white,
-                                )),
-                          ),
-                        ],
-                      ),
-                    ),
+                            )),
+                        Colors.orange),
                   ],
                 ),
               ),
             ],
+          )
+        ],
+      ),
+    );
+  }
+
+  Nemo(Iterable<CallLogEntry> entry, titleName, result, color) {
+    return Container(
+      height: 100,
+      decoration: BoxDecoration(
+        color: color,
+        borderRadius: BorderRadius.circular(10.0),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: <Widget>[
+          ListTile(
+            title: Text(
+              titleName,
+              style: GoogleFonts.gaegu(
+                  textStyle: TextStyle(
+                      color: Colors.white,
+                      fontSize: 24,
+                      decoration: TextDecoration.underline)),
+            ),
+            trailing: Icon(
+              Icons.how_to_vote,
+              color: Colors.white,
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.only(left: 16.0),
+            // child: Text("${entry.length.toString()} 건",
+            child: result,
           )
         ],
       ),
