@@ -67,6 +67,10 @@ class CallLogs {
     return DateFormat('y년 MM월 dd일 HH시mm분').format(dt);
   }
 
+  String getDate(DateTime dt){
+    return DateFormat('y년 MM월 dd일').format(dt);
+  }
+
   getTitle(CallLogEntry entry) {
     if (entry.name == null) return Text(entry.number!,style: TextStyle(color: Colors.white));
     if (entry.name!.isEmpty)

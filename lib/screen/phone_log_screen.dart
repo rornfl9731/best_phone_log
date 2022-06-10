@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:call_log/call_log.dart';
 import 'package:google_fonts/google_fonts.dart';
 import './callLogs.dart';
+import 'dart:developer';
 
 class PhonelogsScreen extends StatefulWidget {
   @override
@@ -63,22 +64,137 @@ class _PhonelogsScreenState extends State<PhonelogsScreen>
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.done) {
                   Iterable<CallLogEntry>? entries = snapshot.data;
+
                   return Expanded(
                     child: ListView.builder(
                       itemBuilder: (context, index) {
+                        //print(cl.getDate(new DateTime.fromMillisecondsSinceEpoch(entries!.elementAt(index).timestamp!)));
+                        final aa = cl.getDate(new DateTime.fromMillisecondsSinceEpoch(entries!.elementAt(index).timestamp!));
+
+                        if(index==0){
+                          return Column(
+                            children: [
+                              Text(aa.toString()),
+                              GestureDetector(
+                                child: Card(
+                                  color: Colors.grey.shade800 ,
+                                  shape: RoundedRectangleBorder(
+                                    side: BorderSide(
+                                        color: Colors.white,width: 3
+                                    ),
+                                    borderRadius: const BorderRadius.all(Radius.circular(12)),
+                                  ),
+                                  child: ListTile(
+                                    leading: cl.getAvator(
+                                        entries.elementAt(index).callType!),
+                                    title: cl.getTitle(entries.elementAt(index)),
+                                    subtitle: Text(cl.formatDate(
+                                        new DateTime.fromMillisecondsSinceEpoch(
+                                            entries
+                                                .elementAt(index)
+                                                .timestamp!)) +
+                                        "\n" +
+                                        cl.getTime(
+                                            entries.elementAt(index).duration!),style: TextStyle(color: Colors.white),),
+                                    isThreeLine: true,
+                                    trailing: IconButton(
+                                        icon: Icon(Icons.phone),
+                                        color: Colors.green,
+                                        onPressed: () {
+                                          //cl.call(entries.elementAt(index).number!);
+                                        }),
+                                  ),
+                                ),
+                                onLongPress: () => {print('call')},
+                              ),
+                            ],
+                          );
+                        }
+                        else if(aa == cl.getDate(new DateTime.fromMillisecondsSinceEpoch(entries.elementAt(index-1).timestamp!))){
+                          return GestureDetector(
+                            child: Card(
+                              color: Colors.grey.shade800 ,
+                              shape: RoundedRectangleBorder(
+                                side: BorderSide(
+                                    color: Colors.white,width: 3
+                                ),
+                                borderRadius: const BorderRadius.all(Radius.circular(12)),
+                              ),
+                              child: ListTile(
+                                leading: cl.getAvator(
+                                    entries.elementAt(index).callType!),
+                                title: cl.getTitle(entries.elementAt(index)),
+                                subtitle: Text(cl.formatDate(
+                                    new DateTime.fromMillisecondsSinceEpoch(
+                                        entries
+                                            .elementAt(index)
+                                            .timestamp!)) +
+                                    "\n" +
+                                    cl.getTime(
+                                        entries.elementAt(index).duration!),style: TextStyle(color: Colors.white),),
+                                isThreeLine: true,
+                                trailing: IconButton(
+                                    icon: Icon(Icons.phone),
+                                    color: Colors.green,
+                                    onPressed: () {
+                                      //cl.call(entries.elementAt(index).number!);
+                                    }),
+                              ),
+                            ),
+                            onLongPress: () => {print('call')},
+                          );
+                        }
+                        else{
+                          return Column(
+                            children: [
+                              Text(aa.toString()),
+                              GestureDetector(
+                                child: Card(
+                                  color: Colors.grey.shade800 ,
+                                  shape: RoundedRectangleBorder(
+                                    side: BorderSide(
+                                        color: Colors.white,width: 3
+                                    ),
+                                    borderRadius: const BorderRadius.all(Radius.circular(12)),
+                                  ),
+                                  child: ListTile(
+                                    leading: cl.getAvator(
+                                        entries.elementAt(index).callType!),
+                                    title: cl.getTitle(entries.elementAt(index)),
+                                    subtitle: Text(cl.formatDate(
+                                        new DateTime.fromMillisecondsSinceEpoch(
+                                            entries
+                                                .elementAt(index)
+                                                .timestamp!)) +
+                                        "\n" +
+                                        cl.getTime(
+                                            entries.elementAt(index).duration!),style: TextStyle(color: Colors.white),),
+                                    isThreeLine: true,
+                                    trailing: IconButton(
+                                        icon: Icon(Icons.phone),
+                                        color: Colors.green,
+                                        onPressed: () {
+                                          //cl.call(entries.elementAt(index).number!);
+                                        }),
+                                  ),
+                                ),
+                                onLongPress: () => {print('call')},
+                              ),
+                            ],
+                          );
+                        }
                         return GestureDetector(
                           child: Card(
-
                             color: Colors.grey.shade800 ,
                             shape: RoundedRectangleBorder(
                               side: BorderSide(
-                                color: Colors.white
+                                color: Colors.white,width: 3
                               ),
                               borderRadius: const BorderRadius.all(Radius.circular(12)),
                             ),
                             child: ListTile(
                               leading: cl.getAvator(
-                                  entries!.elementAt(index).callType!),
+                                  entries.elementAt(index).callType!),
                               title: cl.getTitle(entries.elementAt(index)),
                               subtitle: Text(cl.formatDate(
                                       new DateTime.fromMillisecondsSinceEpoch(
@@ -111,4 +227,6 @@ class _PhonelogsScreenState extends State<PhonelogsScreen>
       ),
     );
   }
+
+
 }
