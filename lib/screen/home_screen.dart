@@ -1,8 +1,9 @@
 import 'dart:collection';
-
+import 'package:share_plus/share_plus.dart';
 import 'package:call_log/call_log.dart';
 import 'package:flutter/material.dart';
-
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'callLogs.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -13,6 +14,7 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
+  final TextStyle whiteText = TextStyle(color: Colors.white);
   CallLogs cl = CallLogs();
   late Future<Iterable<CallLogEntry>> logs;
 
@@ -21,7 +23,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
     // TODO: implement initState
     super.initState();
     WidgetsBinding.instance.addObserver(this);
-    logs = cl.getCallLogs();
+    logs = cl.getToday();
   }
 
   @override
@@ -37,143 +39,305 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
 
     if (AppLifecycleState.resumed == state) {
       setState(() {
-        logs = cl.getCallLogs();
+        logs = cl.getToday();
       });
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      child: Scaffold(
-        appBar: AppBar(
-          centerTitle: true,
-          title: Text('전화 기록'),
-          toolbarHeight: 60,
-          backgroundColor: Colors.black26,
+    return Scaffold(
+      backgroundColor: Colors.grey.shade800,
+      appBar: AppBar(
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        centerTitle: true,
+        title: Text(
+          "Today'history",
+          style: GoogleFonts.gaegu(
+              textStyle: TextStyle(color: Colors.white, fontSize: 25)),
         ),
-        body: Column(
-          children: [
-            //TextField(controller: t1, decoration: InputDecoration(labelText: "Phone number", contentPadding: EdgeInsets.all(10), suffixIcon: IconButton(icon: Icon(Icons.phone), onPressed: (){print("pressed");})),keyboardType: TextInputType.phone, textInputAction: TextInputAction.done, onSubmitted: (value) => call(value),),
-            FutureBuilder<Iterable<CallLogEntry>>(
-                future: logs,
-                builder: (context, snapshot) {
-                  if (snapshot.connectionState == ConnectionState.done) {
-                    Iterable<CallLogEntry>? entries = snapshot.data;
-                    return Expanded(
-                      child: Column(
-                        children: [
-                          Expanded(
-                            flex: 2,
-                            child: Column(
-                              children: [
-                                Text(
-                                    " 총 통화 : ${snapshot.data!.length.toString()}"),
-                                Ranking(entries!),
-                              ],
-                            ),
-                          ),
-                          Expanded(
-                            flex: 20,
-                            child: ListView.builder(
-                              itemBuilder: (context, index) {
-                                return GestureDetector(
-                                  child: Card(
-                                    child: ListTile(
-                                      leading: cl.getAvator(
-                                          entries.elementAt(index).callType!),
-                                      title:
-                                          cl.getTitle(entries.elementAt(index)),
-                                      subtitle: Text(cl.formatDate(new DateTime
-                                                  .fromMillisecondsSinceEpoch(
-                                              entries
-                                                  .elementAt(index)
-                                                  .timestamp!)) +
-                                          "\n" +
-                                          cl.getTime(entries
-                                              .elementAt(index)
-                                              .duration!)),
-                                      isThreeLine: true,
-                                      trailing: IconButton(
-                                          icon: Icon(Icons.phone),
-                                          color: Colors.green,
-                                          onPressed: () {
-                                            //cl.call(entries.elementAt(index).number!);
-                                          }),
-                                    ),
-                                  ),
-                                  onLongPress: () => {print('call')},
-                                );
-                              },
-                              itemCount: entries.length,
-                            ),
-                          ),
-                        ],
-                      ),
-                    );
-                  } else {
-                    return Center(child: CircularProgressIndicator());
-                  }
-                })
-          ],
-        ),
+        toolbarHeight: 60,
+        actions: [
+          IconButton(
+              onPressed: () async {
+                await Share.share("공유하기 테스트");
+              },
+              icon: Icon(Icons.share))
+        ],
+      ),
+      body: Column(
+        children: [
+          FutureBuilder<Iterable<CallLogEntry>>(
+              future: logs,
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.done) {
+                  Iterable<CallLogEntry>? entries = snapshot.data;
+
+                  return Ranking(entries!);
+                } else {
+                  return Center(child: CircularProgressIndicator());
+                }
+              }),
+        ],
       ),
     );
   }
 
-  Ranking(Iterable<CallLogEntry> entry){
+  Ranking(Iterable<CallLogEntry> entry) {
     Map my_map = {};
     var rs = entry.fold(0, (previousValue, element) {
-      if(my_map.containsKey(element.number)){
-        my_map[element.number] += element.duration;
-      }
-      else{
-        my_map[element.number] = element.duration;
+      if (my_map.containsKey(element.number)) {
+        my_map[element.number][0] += element.duration;
+        my_map[element.number][3] += 1;
+      } else {
+        my_map[element.number] = [
+          element.duration,
+          element.name,
+          element.formattedNumber,
+          1
+        ];
       }
       return element.duration! + (previousValue as num);
     });
-
-    final sortedValuesDesc = SplayTreeMap<String, dynamic>.from(
-        my_map, (keys1, keys2) => my_map[keys2]!.compareTo(my_map[keys1]!));
+    print(my_map);
+    final sortedValuesDesc = SplayTreeMap<String, dynamic>.from(my_map,
+        (keys1, keys2) => my_map[keys2][0]!.compareTo(my_map[keys1][0]!));
     print(sortedValuesDesc);
 
-    var first = sortedValuesDesc.keys.toList()[0];
-    var first_ = sortedValuesDesc.values.toList()[0];
-    var second = sortedValuesDesc.keys.toList()[1];
-    
+    final sortedValuesDesc2 = SplayTreeMap<String, dynamic>.from(my_map,
+        (keys1, keys2) => my_map[keys2][3]!.compareTo(my_map[keys1][3]!));
 
+    var todayBest;
+    var todayBest2;
+    if (entry.length > 0) {
+      todayBest = sortedValuesDesc.values.toList()[0][1];
+      if (todayBest == null) {
+        todayBest = sortedValuesDesc.values.toList()[0][2];
+      }
+    } else {
+      todayBest = "";
+    }
+    var toHour;
+    var toMin;
+    var toSec;
+    bool toIsHour = false;
+    bool toIsMin = false;
+    var bestTime = sortedValuesDesc.values.toList()[0][0];
+    print(bestTime);
+    if (bestTime >= 3600) {
+      toIsHour = true;
+      toHour = (bestTime / 3600).toInt();
+      bestTime = bestTime - toHour * 3600;
+      toMin = (bestTime / 60).toInt();
+      bestTime = bestTime - toMin * 60;
+      toSec = bestTime;
+    } else if (bestTime < 3600 && bestTime >= 60) {
+      toIsMin = true;
+      toMin = (bestTime / 60).toInt();
+      bestTime = bestTime - toMin * 60;
+      toSec = bestTime;
+    } else {
+      toSec = bestTime;
+    }
+    print(toHour);
+    print(toMin);
+    print(toSec);
 
     var hour;
     var min;
     var sec;
+    bool isHour = false;
+    bool isMin = false;
 
-    if(rs >= 3600){
+    if (rs >= 3600) {
+      isHour = true;
       hour = (rs / 3600).toInt();
-      rs = rs - hour*3600;
-      min = (rs/60).toInt();
-      rs = rs - min*60;
+      rs = rs - hour * 3600;
+      min = (rs / 60).toInt();
+      rs = rs - min * 60;
       sec = rs;
+    } else if (rs < 3600 && rs >= 60) {
+      isMin = true;
+      min = (rs / 60).toInt();
+      rs = rs - min * 60;
+      sec = rs;
+    } else {
+      sec = rs;
+    }
 
-      return Column(
+    return SingleChildScrollView(
+      padding: EdgeInsets.all(16),
+      child: Column(
         children: [
-          Text(" 총 시간 : ${hour.toString()}시간 ${min.toString()}분 ${sec}초"),
-          Text(" 총 시간 : ${first} -> ${first_}"),
+          Row(
+            children: [
+              Expanded(
+                child: Column(
+                  children: <Widget>[
+                    Container(
+                      height: 100,
+                      decoration: BoxDecoration(
+                        color: Colors.deepOrangeAccent,
+                        borderRadius: BorderRadius.circular(10.0),
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: <Widget>[
+                          ListTile(
+                            title: Text(
+                              '오늘의 통화시간',
+                              style: GoogleFonts.gaegu(
+                                  textStyle: TextStyle(
+                                      color: Colors.white, fontSize: 24)),
+                            ),
 
+                            // title : isHour ? Text("${hour.toString()}시간 ${min.toString()}분 ${sec}초",style:TextStyle(fontSize: 24,color: Colors.white,)) :
+                            // isMin ? Text("${min.toString()}분 ${sec}초",style:TextStyle(fontSize: 24,color: Colors.white,)) : Text("${sec}초",style:TextStyle(fontSize: 24,color: Colors.white,)),
+                            trailing: Icon(
+                              FontAwesomeIcons.phone,
+                              color: Colors.white,
+                            ),
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.only(left: 16.0),
+                            // child: Text(
+                            //   '오늘의 통화시간',
+                            //   style: GoogleFonts.gaegu(
+                            //       textStyle: TextStyle(
+                            //           color: Colors.white, fontSize: 20)),
+                            // ),
+                            child : isHour ? Text("${hour.toString()}시간 ${min.toString()}분 ${sec}초",style:TextStyle(fontSize: 24,color: Colors.white,)) :
+                            isMin ? Text("${min.toString()}분 ${sec}초",style:TextStyle(fontSize: 24,color: Colors.white,)) : Text("${sec}초",style:TextStyle(fontSize: 24,color: Colors.white,)),
+
+                          )
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: 10.0),
+                    Container(
+                      height: 100,
+                      decoration: BoxDecoration(
+                        color: Colors.green,
+                        borderRadius: BorderRadius.circular(10.0),
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: <Widget>[
+                          ListTile(
+                            title:Text(
+                              '오늘의 통화건수',
+                              style: GoogleFonts.gaegu(
+                                  textStyle: TextStyle(
+                                      color: Colors.white, fontSize: 24)),
+                            ),
+
+                            trailing: Icon(
+                              Icons.how_to_vote,
+                              color: Colors.white,
+                            ),
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.only(left: 16.0),
+                            child: Text("${entry.length.toString()} 건",
+                                style: TextStyle(
+                                  fontSize: 24,
+                                  color: Colors.white,
+                                )),
+                          )
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: 10.0),
+                    Container(
+                      height: 100,
+                      decoration: BoxDecoration(
+                        color: Colors.blue,
+                        borderRadius: BorderRadius.circular(10.0),
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: <Widget>[
+                          ListTile(
+                            title : Text(
+                              '누구랑 가장 오래 통화했어?',
+                              style: GoogleFonts.gaegu(
+                                  textStyle: TextStyle(
+                                      color: Colors.white, fontSize: 24)),
+                            ),
+
+                            trailing: Icon(
+                              FontAwesomeIcons.heart,
+                              color: Colors.white,
+                            ),
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.only(left: 16.0),
+                            child: toIsHour
+                                ? Text(
+                                "${toHour.toString()}시간 ${toMin.toString()}분 ${toSec}초 with ${todayBest}",
+                                style: TextStyle(
+                                  fontSize: 24,
+                                  color: Colors.white,
+                                ))
+                                : toIsMin
+                                ? Text(
+                                "${toMin.toString()}분 ${toSec}초 with ${todayBest}",
+                                style: TextStyle(
+                                  fontSize: 24,
+                                  color: Colors.white,
+                                ))
+                                : Text("${toSec}초 with ${todayBest}",
+                                style: TextStyle(
+                                  fontSize: 24,
+                                  color: Colors.white,
+                                )),
+                          )
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: 10.0),
+                    Container(
+                      height: 100,
+                      decoration: BoxDecoration(
+                        color: Colors.orange,
+                        borderRadius: BorderRadius.circular(10.0),
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: <Widget>[
+                          ListTile(
+                            title : Text(
+                              '누구랑 가장 여러번 통화했어?',
+                              style: GoogleFonts.gaegu(
+                                  textStyle: TextStyle(
+                                      color: Colors.white, fontSize: 24)),
+                            ),
+
+                            trailing: Icon(
+                              FontAwesomeIcons.businessTime,
+                              color: Colors.white,
+                            ),
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.fromLTRB(16,0,0,0),
+                            child: Text(
+                                "${sortedValuesDesc2.values.toList()[0][3]}통 with ${sortedValuesDesc2.values.toList()[0][1]}",
+                                style: TextStyle(
+                                  fontSize: 24,
+                                  color: Colors.white,
+                                )),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          )
         ],
-      );
-    }
-    else if(rs<3600 && rs>=60){
-      min = (rs/60).toInt();
-      rs = rs - min*60;
-      sec = rs;
-      return Text(" 총 시간 : ${min.toString()}분 ${sec}초");
-    }else{
-      return Text(" 총 시간 : ${sec}초");
-    }
-
-
-
-
+      ),
+    );
   }
-
 }
